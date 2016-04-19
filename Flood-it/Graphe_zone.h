@@ -61,9 +61,9 @@ void detruit_liste_sommet(Cellule_som *cell_som);
 
 void ajoute_voisin(Sommet *s1, Sommet *s2);
 
-void cree_graphe_zone( Graphe_zone *G, int** M, int nb);
+void cree_graphe_zone( Graphe_zone *G, int** M, int dim);
 
-void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int nb);
+void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int dim);
 
 void affichage_graphe(Graphe_zone *G, int nb);
 

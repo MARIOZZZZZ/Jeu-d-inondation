@@ -49,7 +49,7 @@ Cellule_som *ajoute_liste_sommet(Sommet *psommet, Cellule_som *cell_som){
 
   cell->sommet = psommet;
   cell->suiv = cell_som;
-   printf("test6\n");
+ 
   return cell;
 
 }
@@ -73,7 +73,7 @@ void ajoute_voisin(Sommet *s1, Sommet *s2){
 }
 
 
-void cree_graphe_zone( Graphe_zone *G, int** M, int nb){
+void cree_graphe_zone( Graphe_zone *G, int** M, int dim){
 
   int i, j;
   Sommet *s = NULL, *s2 = NULL;
@@ -81,9 +81,8 @@ void cree_graphe_zone( Graphe_zone *G, int** M, int nb){
   // ici on considere G->som = NULL de base
       
   // allocation des sommets de G
-  for (i=0; i<nb; i++){
-    printf("test1\n");
-    for (j=0; j<nb; j++)
+  for (i=0; i<dim; i++){
+    for (j=0; j<dim; j++){
 
      
       if (G->mat[i][j] == NULL) {
@@ -96,8 +95,10 @@ void cree_graphe_zone( Graphe_zone *G, int** M, int nb){
 	/*init_liste(&(s->cases));*/
 
 	s->cases->i = i; /* !!!!!! */
-	//	printf("test7\n");
+
 	s->cases->j = j;
+
+	s->cases->suiv = NULL;
 	s->sommet_adj = NULL;
 	
 	G->mat[i][j] = s;
@@ -108,18 +109,19 @@ void cree_graphe_zone( Graphe_zone *G, int** M, int nb){
 	 * donc le "dernier" element sera a NULL
 	 */
 	G->som = ajoute_liste_sommet(s, G->som);
-	// printf("test2\n");
-
+	
 	// on remplit les sommets en appelant trouve_zone
-	trouve_zone(M, i, j, s, G, nb);
-
+	trouve_zone(M, i, j, s, G, dim);
+	
       }
+
+    }
   }
 
 
   // recherche des sommets adjacents
-  for (i=0; i < nb; i++)
-    for(j=0; j < (nb - 1); j++) {
+  for (i=0; i < dim; i++)
+    for(j=0; j < (dim - 1); j++) {
       /* Si deux cases adjacentes de la matrice pointent vers des Sommets
        * differents qui ne sont pas deja adjacents alors une relation
        * d'adjacence est ajoutée. Sinon, on passe aux cases suivantes
@@ -130,78 +132,80 @@ void cree_graphe_zone( Graphe_zone *G, int** M, int nb){
       if (s == s2 || adjacent(s, s2) != 0)
 	continue;
 
-      // Si les sommets sont diff et qu'ils ne sont pas deja adjacents
+     
       ajoute_voisin(s, s2);
     }
 }
 
-void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int nb){
+void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int dim){
 
   Liste *p = malloc (sizeof(Liste));
+  int i2 = i, j2 = j;
   
   
 
-  s->cl = M[i][j]; // Mise a jour de la couleur de la case
-  detruit_liste_sommet(s->sommet_adj); // Suppresion des membres de la zone
+  s->cl = M[i2][j2]; // Mise a jour de la couleur de la case
+  // detruit_liste_sommet(s->sommet_adj); // Suppresion des membres de la zone
   s->nbcase_som = 0;
 
 
   init_liste(p);
 
-  ajoute_en_tete(p, i, j); // On empile la premiere case
+  ajoute_en_tete(p, i2, j2); // On empile la premiere case
 
   while (!test_liste_vide(p)) {
-    enleve_en_tete(p, &i, &j);
-    printf("test4\n");
+    enleve_en_tete(p, &i2, &j2);
+   
 
-    if ((j+1 < nb) &&
-	(M[i][j] == s->cl) &&
-	(!rechercher_Liste(i, j+1, p)) &&
-	(!rechercher_Liste(i, j+1, &(s->cases)))) {
-      	printf("test5\n");
-      ajoute_en_tete(&(s->cases), i, j+1); // Ajout de la case a la liste des membres de la zone
+    if ((j2+1 < dim) &&
+	(M[i2][j2] == s->cl) &&
+	(!rechercher_Liste(i2, j2+1, p)) &&
+	(!rechercher_Liste(i2, j2+1, &(s->cases)))) {
+      	
+      ajoute_en_tete(&(s->cases), i2, j2+1); // Ajout de la case a la liste des membres de la zone
       s->nbcase_som++; // Incr du compteur de zone
-      ajoute_en_tete(p, i, j+1);
+      ajoute_en_tete(p, i2, j2+1);
     }
     
 
-    if ((j-1 >= 0) &&
-	(M[i][j] == s->cl) &&
-	(!rechercher_Liste(i, j+1, p)) &&
-	(!rechercher_Liste(i, j-1, &(s->cases)))) {
-      	printf("test9\n");
-      ajoute_en_tete(&(s->cases), i, j-1); // Ajout de la case a la liste des membres de la zone
+    if ((j2-1 >= 0) &&
+	(M[i2][j2] == s->cl) &&
+	(!rechercher_Liste(i2, j2-1, p)) &&
+	(!rechercher_Liste(i2, j2-1, &(s->cases)))) {
+      //printf("test9\n");
+      ajoute_en_tete(&(s->cases), i2, j2-1); // Ajout de la case a la liste des membres de la zone
       s->nbcase_som++; // Incr du compteur de zone
-      ajoute_en_tete(p, i, j-1);
+      ajoute_en_tete(p, i2, j2-1);
     }
 
-    if ((i+1< nb) &&
-	(M[i][j] == s->cl) &&
-	(!rechercher_Liste(i, j+1, p)) &&
-	(!rechercher_Liste(i+1, j, &(s->cases)))) {
-      	printf("test10\n");
-      ajoute_en_tete(&(s->cases), i+1, j); // Ajout de la case a la liste des membres de la zone
+    if ((i2+1< dim) &&
+	(M[i2][j2] == s->cl) &&
+	(!rechercher_Liste(i2+1, j2, p)) &&
+	(!rechercher_Liste(i2+1, j2, &(s->cases)))) {
+      
+      ajoute_en_tete(&(s->cases), i2+1, j2); // Ajout de la case a la liste des membres de la zone
       s->nbcase_som++; // Incr du compteur de zone
-      ajoute_en_tete(p, i+1, j);
+      ajoute_en_tete(p, i2+1, j2);
     }
 
-    if ((i-1 < nb) &&
-	(M[i][j] == s->cl) &&
-	(!rechercher_Liste(i, j+1, p)) &&
-	(!rechercher_Liste(i-1, j, &(s->cases)))) {
-      	printf("test11\n");
-      ajoute_en_tete(&(s->cases), i-1, j); // Ajout de la case a la liste des membres de la zone
+    if ((i2-1 >= 0) &&
+	(M[i2][j2] == s->cl) &&
+	(!rechercher_Liste(i2-1, j2, p)) &&
+	(!rechercher_Liste(i2-1, j2, &(s->cases)))) {
+      
+      ajoute_en_tete(&(s->cases), i2-1, j2); // Ajout de la case a la liste des membres de la zone
       s->nbcase_som++; // Incr du compteur de zone
-      ajoute_en_tete(p, i-1, j);
+      ajoute_en_tete(p, i2-1, j2);
     }
     
   
     //On pointe la case de la matrice de G sur la zone
-    G->mat[i][j] = s;
-    G->som++;
-
+    G->mat[i2][j2] = s;
+    // G->som++;
+    
    
   }
+  
   detruit_liste(p);
 
 }
@@ -237,7 +241,7 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
   Cellule_som *temp = a;
   
   Sommet *Zsg = G->mat[0][0];
-  Liste *casesAAjouter = NULL, *elem = NULL;
+  Liste casesAAjouter, elem;
 
   tab = (int *) malloc(sizeof(int) * nbCl);
   if(tab == NULL) {
@@ -249,30 +253,36 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
       tab[i] = 0;
 
   while(a != NULL) {
-      tab[(a->sommet)->cl]++;
-      a = a->suiv;
+    
+    tab[(a->sommet)->cl]++;
+    a = a->suiv;
     }
-  
+
+ 
   for(i = 1; i < nbCl; i++) {
+   
     if(tab[i] > tab[iMax]) {
       iMax = i;
     }
     else {
       iMax = iMax;
     }
-     
+    
   }
   // iMax -> indice de la couleur la plus presente = valeur de la couleur
-  changeCouleurZsg(G, M, iMax);
+
+   changeCouleurZsg(G, M, iMax);
+
+   
 
   // on supprime toutes les zones de la bordure de la meme couleur que iMax
   // on ajoute a la zsg les cases des zones supprimees et leurs adjacences
   // on a le nombre de zones dans tab[iMax]
 
   a = (G->mat[0][0])->sommet_adj;
-  elem = &(Zsg->cases);
-  while((*elem)->suiv != NULL)
-    elem = &((*elem)->suiv);
+  elem = Zsg->cases;
+  while (elem->suiv != NULL)
+    elem = elem->suiv;
 
   while(a != NULL) {
     
@@ -286,21 +296,23 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
       
       // on enleve a de la liste d'adjacence de Zsg
       // recuperation des cases
-      casesAAjouter = &(a->sommet->cases);
-      (*elem)->suiv = *casesAAjouter;
+      casesAAjouter = a->sommet->cases;
+      elem->suiv = casesAAjouter;
       
-      while ((*elem)->suiv) {
-	i = (*elem)->i; // ajoute de Zsg dans la matrice de Sommets
-	j = (*elem)->j; // pour les nouvelles cases
+      while (elem->suiv) {
+	i = elem->i; // ajoute de Zsg dans la matrice de Sommets
+	j = elem->j; // pour les nouvelles cases
 	G->mat[i][j] = Zsg;
-	elem = &((*elem)->suiv);
+	elem = elem->suiv;
       }
 
       // destruction du sommet
       temp->suiv = a->suiv;
       free(a); //on a supprime un sommet
       a = temp->suiv;
+      printf("G2->nbsom=%d\n", G->nbsom);
       G->nbsom--; // on le retire du compteur
+      printf("G->nbsom=%d\n", G->nbsom);
 
 
     }
@@ -310,19 +322,20 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
       a = a->suiv;
     }
   }
+  
 }
 
 
 void changeCouleurZsg(Graphe_zone *G, int ** M,  int cl)
 {
-  Liste *elem = &((G->mat[0][0])->cases);
+  Liste elem = G->mat[0][0]->cases;
   int i, j;
-  (G->mat[0][0])->cl = cl;
+  G->mat[0][0]->cl = cl;
 
   while(elem != NULL) {
-    i = (*elem)->i;
-    j = (*elem)->j;
+    i = elem->i;
+    j = elem->j;
       M[i][j] = cl;
-      elem = &((*elem)->suiv);
+      elem = elem->suiv;
     }
 }

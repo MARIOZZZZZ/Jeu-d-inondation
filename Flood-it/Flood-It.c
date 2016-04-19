@@ -106,7 +106,7 @@ int main(int argc,char**argv){
 
       /*------------------------*/
 
-      iter = sequence_aleatoire_rec(M, G, dim, nbcl, 1);
+      iter = sequence_aleatoire_rec(M, G, dim, nbcl, 0);
       
       printf("%d Iterations necessaires!\n", iter);
 
