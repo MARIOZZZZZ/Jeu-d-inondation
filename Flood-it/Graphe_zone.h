@@ -68,7 +68,7 @@ void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int dim);
 void affichage_graphe(Graphe_zone *G, int nb);
 
 /* Mise a jour de la bordure graphe */
-void maj_bordure_graphe(Graphe_zone *G, int **M, int nbcl);
+void maj_bordure_graphe(Graphe_zone *G, int **M, int nbcl, int dim);
 
 /* On prend un graphe et une couleur
  *	On change la couleur du sommet de la Zsg

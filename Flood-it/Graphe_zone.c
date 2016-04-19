@@ -228,7 +228,7 @@ void affichage_graphe(Graphe_zone *G, int nb){
 
 }
 
-void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
+void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl, int dim)
 {
   int i, j, iMax = 0;
   int *tab = NULL;
@@ -254,7 +254,8 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
 
   while(a != NULL) {
     
-    tab[(a->sommet)->cl]++;
+    
+    tab[(a->sommet)->cl] += a->sommet->nbcase_som;
     a = a->suiv;
     }
 
@@ -271,7 +272,7 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
   }
   // iMax -> indice de la couleur la plus presente = valeur de la couleur
 
-   changeCouleurZsg(G, M, iMax);
+  changeCouleurZsg(G, M, iMax);
 
    
 
@@ -279,19 +280,35 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
   // on ajoute a la zsg les cases des zones supprimees et leurs adjacences
   // on a le nombre de zones dans tab[iMax]
 
-  a = (G->mat[0][0])->sommet_adj;
+  G->nbsom = 0;
+  G->som = NULL;
+
+  G->mat = NULL;
+	
+  G->mat = (Sommet ***) malloc(sizeof(Sommet**)*dim);
+	
+  for(i = 0; i < dim; i++) {
+    G->mat[i] = (Sommet **) malloc(sizeof(Sommet*)*dim);
+   
+    for(j = 0; j < dim; j++)
+      G->mat[i][j] = NULL;
+  }
+
+  cree_graphe_zone(G, M, dim);
+  
+  /* a = (G->mat[0][0])->sommet_adj;
   elem = Zsg->cases;
   while (elem->suiv != NULL)
     elem = elem->suiv;
-
+  
   while(a != NULL) {
     
     if((a->sommet)->cl == iMax) {
       bordureElem = a->sommet->sommet_adj;
       
       while (bordureElem) { // ajout des adjacences
-				ajoute_voisin(a->sommet, bordureElem->sommet);
-				bordureElem = bordureElem->suiv;
+	ajoute_voisin(a->sommet, bordureElem->sommet);
+	bordureElem = bordureElem->suiv;
       }
       
       // on enleve a de la liste d'adjacence de Zsg
@@ -321,7 +338,7 @@ void maj_bordure_graphe(Graphe_zone *G, int **M, int nbCl)
       temp = a;
       a = a->suiv;
     }
-  }
+    }*/
   
 }
 

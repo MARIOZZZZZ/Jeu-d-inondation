@@ -22,10 +22,10 @@ int maxBordure(Grille *Gr, int **M, int dim){
   }
   
   cree_graphe_zone(G, M, dim);
-  printf("nbsom=%d\n",G->nbsom);
-  while (G->nbsom > 0) {
-    maj_bordure_graphe(G, M, Gr->nbcl);
-
+  
+  while (G->nbsom > 1) {
+    maj_bordure_graphe(G, M, Gr->nbcl, dim);
+    printf("nbsom=%d\n",G->nbsom);
     for (i=0;i<dim; i++ )
       for (j=0;j<dim;j++)
 	Grille_attribue_couleur_case(Gr,i,j,M[i][j]);
